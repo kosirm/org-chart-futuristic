@@ -1,20 +1,24 @@
 <html>
-  <head>
-    <meta charset="UTF-8" />
-  </head>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
+        <script src="./alpinejs_3_13_3.min.js" defer></script>
+        <div class="chart-container" style="height: 1200px"></div>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+        <script>
 
-  <body>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-org-chart@2.6.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-flextree@2.1.2/build/d3-flextree.js"></script>
-
-    <div class="chart-container" style="height: 1200px"></div>
-
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <script>
+      function markRoot(id){
+        chart.clearHighlighting()
+        chart.setUpToTheRootHighlighted(id).render().fit()
+      }
+      function highlight(id){
+        chart.clearHighlighting()
+        chart.setHighlighted(id).render()
+      }
       var chart;
       d3.csv(
         'https://raw.githubusercontent.com/bumbeishvili/sample-data/main/org.csv'
@@ -35,14 +39,16 @@
           .childrenMargin((d) => 90)
           .compactMarginBetween((d) => 65)
           .compactMarginPair((d) => 100)
-          .neightbourMargin((a, b) => 50)
+          //.neightbourMargin((a, b) => 50)
           .siblingsMargin((d) => 100)
           .buttonContent(({ node, state }) => {
-            return `<div style="color:#2CAAE5;border-radius:5px;padding:3px;font-size:10px;margin:auto auto;background-color:#040910;border: 1px solid #2CAAE5"> <span style="font-size:9px">${
-              node.children
-                ? `<i class="fas fa-angle-up"></i>`
-                : `<i class="fas fa-angle-down"></i>`
-            }</span> ${node.data._directSubordinates}  </div>`;
+            return `<div style="position:absolute;left:-8px;bottom:-8px;color:#2CAAE5;border-radius:30px;padding:10px;font-size:50px;margin:auto auto;background-color:#040910; border: 1px solid #2CAAE5">
+              <span style="padding-left:10px; padding-right:10px; font-size:25px;">
+                ${node.children
+                    ? `<i class="fas fa-angle-up" style:"color:red;"></i>`
+                    : `<b>${node.data._directSubordinates}</b>`
+                  }
+            </span>   </div>`;
           })
           .linkUpdate(function (d, i, arr) {
             d3.select(this)
@@ -64,31 +70,18 @@
                           <div class="right-top" style="position:absolute;right:-10px;top:-10px">  ${svgStr}</div>
                           <div class="right-bottom" style="position:absolute;right:-10px;bottom:-14px">  ${svgStr}</div>
                           <div class="left-bottom" style="position:absolute;left:-10px;bottom:-14px">  ${svgStr}</div>
-                          <div style="font-family: 'Inter'; background-color:#040910;sans-serif; position:absolute;margin-top:-1px; margin-left:-1px;width:${
-                            d.width
-                          }px;height:${d.height}px;border-radius:0px;border: 2px solid #2CAAE5">
+                          <div 
+                          onclick="markRoot('${d.data.id}')"
+                          style="font-family: 'Inter'; background-color:#081424;sans-serif; position:absolute;margin-top:-1px; margin-left:-1px;width:${d.width}px;height:${d.height}px;border-radius:0px;border: 2px solid #2CAAE5">
                              
                              <div class="pie-chart-wrapper" style="margin-left:-10px;margin-top:5px;width:320px;height:300px"></div>
                            
-                            <div style="color:#2CAAE5;position:absolute;right:15px;top:-20px;">
-                              <div style="font-size:15px;color:#2CAAE5;margin-top:32px"> ${
-                                d.data.name
-                              } </div>
-                              <div style="font-size:10px;"> ${
-                                d.data.positionName || ''
-                              } </div>
-                              <div style="font-size:10px;"> ${
-                                d.data.id || ''
-                              } </div>
-                              ${
-                                d.depth == 0
-                                  ? `                              <br/>
-                              <div style="max-width:200px;font-size:10px;">
-                                A corporate history of Ian is a chronological account of a business or other co-operative organization he founded.  <br><br>Usually it is produced in written format but it can also be done in audio or audiovisually  
-                              </div>`
-                                  : ''
-                              }
-
+                            <div 
+                            onclick="markRoot('${d.data.id}')"
+                            style="color:#2CAAE5;position:absolute;right:15px;top:-20px;">
+                              <div style="font-size:15px;color:#2CAAE5;margin-top:32px"> ${d.data.name} </div>
+                              <div style="font-size:10px;"> ${d.data.positionName || '' } </div>
+                              <div style="font-size:10px;"> ${ d.data.id || ''} </div>
                             </div>
 
                             <div style="position:absolute;left:-5px;bottom:10px;">
@@ -100,7 +93,7 @@
                                       i * 12
                                     }" height=${h}  y=${
                                       30 - h
-                                    } fill="#B41425"/>`;
+                                    } fill="#d77729"/>`;
                                   })
                                   .join('')}  </svg>
                                 </div>
@@ -122,25 +115,25 @@
                 d.data._highlighted || d.data._upToTheRootHighlighted ? 40 : 1
               );
 
-            const pieChartWrapperNode = d3
-              .select(this)
-              .select('.pie-chart-wrapper')
-              .node();
-            const val = (d.data.name.length * 5) % 100; // Dummy calc
-            // General pie chart invokation code
-            new PieChart()
-              .data([
-                { key: 'plan', color: '#6EC2EA', value: val },
-                { key: 'exec', color: '#0D5AAF', value: 100 - val },
-              ])
-              .container(pieChartWrapperNode)
-              .svgHeight(200)
-              .svgWidth(320)
-              .marginTop(40)
-              .image(d.data.imageUrl)
-              .backCircleColor('#1F72A7')
-              .defaultFont('Inter')
-              .render();
+            // const pieChartWrapperNode = d3
+            //   .select(this)
+            //   .select('.pie-chart-wrapper')
+            //   .node();
+            // const val = (d.data.name.length * 5) % 100; // Dummy calc
+            // // General pie chart invokation code
+            // new PieChart()
+            //   .data([
+            //     { key: 'plan', color: '#6EC2EA', value: val },
+            //     { key: 'exec', color: '#0D5AAF', value: 100 - val },
+            //   ])
+            //   .container(pieChartWrapperNode)
+            //   .svgHeight(200)
+            //   .svgWidth(320)
+            //   .marginTop(40)
+            //   .image(d.data.imageUrl)
+            //   .backCircleColor('#1F72A7')
+            //   .defaultFont('Inter')
+            //   .render();
           })
           .render();
 
@@ -178,32 +171,24 @@
           },
         });
       }
-    </script>
-    <script src="./pieChart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
-    <style>
+        </script>
+        <script src="./pieChart.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+        <style>
       body {
         background-color: #000c0e;
       }
-    </style>
-
-    <script>
+        </style>
+        <script>
       var index = 0;
       var compact = 0;
       var actNdCent = 0;
-    </script>
-
-    <style>
+        </script>
+        <style>
       .btn {
         margin: 3px;
         color: inherit;
@@ -268,181 +253,133 @@
         bottom: 0;
         background: radial-gradient(circle at center, #04192b 0, #000b0e 100%);
       }
-    </style>
-
-    <div class="action-buttons">
-      <button
-        onclick='chart.setExpanded("O-6164").render()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-chevron-down"></i> Expand
-      </button>
-      <br />
-
-      <button
-        onclick='chart.setExpanded("O-6164",false).render()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-chevron-up"></i> Collapse</button
-      ><br />
-
-      <button
-        onclick='chart.addNode({imageUrl:"https:\/\/raw.githubusercontent.com/bumbeishvili/Assets/master/Projects/D3/Organization%20Chart/cto.jpg",id:"root child",parentId:"O-6066",name:"test",progress:[25,20,15,10]})'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-folder-plus"></i> Add Node
-      </button>
-      <br />
-
-      <button
-        onclick='chart.removeNode("O-6067")'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-user-times"></i> remove</button
-      ><br />
-
-      <button
-        onclick="chart.fit()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-sync"></i> fit
-      </button>
-      <br />
-
-      <button
-        onclick='chart.layout(["right","bottom","left","top"][index++%4]).render().fit()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-retweet"></i> swap
-      </button>
-      <br />
-
-      <button
-        onclick="chart.compact(!!(compact++%2)).render().fit()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-sitemap"></i> compact
-      </button>
-      <br />
-
-      <button
-        onclick="chart.setActiveNodeCentered(!!(actNdCent++%2)).render()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-border-none"></i> center Active
-      </button>
-      <br />
-
-      <button
-        onclick='chart.setCentered("O-6162").render()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-compress-arrows-alt"></i> center
-      </button>
-      <br />
-      <button
-        onclick='chart.setHighlighted("O-6162").render()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-highlighter"></i> mark</button
-      ><br />
-      <button
-        onclick='chart.setUpToTheRootHighlighted("O-6162").render().fit()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-route"></i> mark root
-      </button>
-      <br />
-      <button
-        onclick="chart.clearHighlighting()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-eraser"></i> clear mark
-      </button>
-      <br />
-      <button
-        onclick="chart.fullscreen('body')"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-expand"></i> fullscreen</button
-      ><br />
-
-      <button
-        onclick="chart.exportImg()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="far fa-images"></i> export img
-      </button>
-      <br />
-
-      <button
-        onclick="chart.exportImg({full:true})"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="far fa-images"></i> export full img
-      </button>
-      <br />
-
-      <button
-        onclick="chart.exportSvg()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-file-download"></i> export svg
-      </button>
-      <br />
-      <button
-        onclick="chart.expandAll()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-angle-double-down"></i> expand all</button
-      ><br />
-
-      <button
-        onclick="chart.collapseAll()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-angle-double-up"></i> collapse all</button
-      ><br />
-
-      <button
-        onclick="downloadPdf()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="far fa-file-pdf"></i> export pdf
-      </button>
-      <br />
-
-      <button
-        onclick='chart.connections([{from:"O-6069",to:"O-6070",label:"Conflicts of interest"}]).render()'
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-project-diagram"></i> add link
-      </button>
-      <br />
-
-      <button
-        onclick="chart.zoomOut()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-minus"></i> zoom out</button
-      ><br />
-      <button
-        onclick="chart.zoomIn()"
-        class="btn btn-action-button waves-effect waves-light"
-      >
-        <i class="fas fa-plus"></i> zoom in
-      </button>
-      <br />
-    </div>
-
-    <script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
-    <script>
-      kofiWidgetOverlay.draw('bumbeishvili', {
-        type: 'floating-chat',
-        'floating-chat.donateButton.text': 'Tip Us',
-        'floating-chat.donateButton.background-color': '#00b9fe',
-        'floating-chat.donateButton.text-color': '#fff',
-      });
-    </script>
-  </body>
+        </style>
+        <div class="action-buttons">
+            <button onclick='chart.setExpanded("O-6164").render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-chevron-down"></i>
+                Expand
+            </button>
+            <br>
+            <button onclick='chart.setExpanded("O-6164",false).render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-chevron-up"></i>
+                Collapse
+            </button>
+            <br>
+            <button onclick='chart.addNode({imageUrl:"https:\/\/raw.githubusercontent.com/bumbeishvili/Assets/master/Projects/D3/Organization%20Chart/cto.jpg",id:"root child",parentId:"O-6066",name:"test",progress:[25,20,15,10]})' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-folder-plus"></i>
+                Add Node
+            </button>
+            <br>
+            <button onclick='chart.removeNode("O-6067")' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-user-times"></i>
+                remove
+            </button>
+            <br>
+            <button onclick="chart.fit()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-sync"></i>
+                fit
+            </button>
+            <br>
+            <button onclick='chart.layout(["bottom"]).render().fit()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-up"></i>
+                up
+            </button>
+            <br>
+            <button onclick='chart.layout(["top"]).render().fit()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-down"></i>
+                down
+            </button>
+            <br>
+            <button onclick='chart.layout(["right"]).render().fit()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-left"></i>
+                left
+            </button>
+            <br>
+            <button onclick='chart.layout(["left"]).render().fit()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-right"></i>
+                right
+            </button>
+            <br>
+            <button onclick="chart.compact(!!(compact++%2)).render().fit()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-sitemap"></i>
+                compact
+            </button>
+            <br>
+            <button onclick="chart.setActiveNodeCentered(!!(actNdCent++%2)).render()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-border-none"></i>
+                center Active
+            </button>
+            <br>
+            <button onclick='chart.setCentered("O-6162").render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-compress-arrows-alt"></i>
+                center
+            </button>
+            <br>
+            <button onclick='chart.setHighlighted("O-6162").render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-highlighter"></i>
+                mark
+            </button>
+            <br>
+            <button onclick='chart.setUpToTheRootHighlighted("O-6162").render().fit()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-route"></i>
+                mark root
+            </button>
+            <br>
+            <button onclick="chart.clearHighlighting()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-eraser"></i>
+                clear mark
+            </button>
+            <br>
+            <button onclick="chart.fullscreen('body')" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-expand"></i>
+                fullscreen
+            </button>
+            <br>
+            <button onclick="chart.exportImg()" class="btn btn-action-button waves-effect waves-light">
+                <i class="far fa-images"></i>
+                export img
+            </button>
+            <br>
+            <button onclick="chart.exportImg({full:true})" class="btn btn-action-button waves-effect waves-light">
+                <i class="far fa-images"></i>
+                export full img
+            </button>
+            <br>
+            <button onclick="chart.exportSvg()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-file-download"></i>
+                export svg
+            </button>
+            <br>
+            <button onclick="chart.expandAll()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-double-down"></i>
+                expand all
+            </button>
+            <br>
+            <button onclick="chart.collapseAll()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-angle-double-up"></i>
+                collapse all
+            </button>
+            <br>
+            <button onclick="downloadPdf()" class="btn btn-action-button waves-effect waves-light">
+                <i class="far fa-file-pdf"></i>
+                export pdf
+            </button>
+            <br>
+            <button onclick='chart.connections([{from:"O-6069",to:"O-6070",label:"Conflicts of interest"}]).render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-project-diagram"></i>
+                add link
+            </button>
+            <br>
+            <button onclick="chart.zoomOut()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-minus"></i>
+                zoom out
+            </button>
+            <br>
+            <button onclick="chart.zoomIn()" class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-plus"></i>
+                zoom in
+            </button>
+            <br>
+        </div>
+    </body>
 </html>
