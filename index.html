@@ -3,8 +3,8 @@
         <meta charset="UTF-8">
     </head>
     <body>
-        <script src="https://d3js.org/d3.v7.min.js"></script>
-        <script src="d3-org-chart.min.js"></script>
+        <script src="d3.v7.min.js"></script>
+        <script src="d3-org-chart.js"></script>
         <script src="d3-flextree.min.js"></script>
         <script src="./alpinejs_3_13_3.min.js" defer></script>
         <div class="chart-container" style="height: 1200px"></div>
@@ -14,9 +14,14 @@
       
       function addNodes(nodes){
         //ovdje ču trebat provjerit, da li node več postoji...
+        //ako postoji, ne prikazuje se paralele dalje, nego samo link na duplikat
+        //console.log (chart.node(node.id))
         nodes.forEach((node) => chart.addNode(node));
       }
 
+      function findNode(id){
+          console.log("Ima li node?:"+chart.findNode(id))
+      }
 
       function markRoot(id){
         chart.clearHighlighting()
@@ -227,27 +232,40 @@
                 Console
             </button>
             <br>
-            <button onclick='chart.setExpanded("O-6164").render()' class="btn btn-action-button waves-effect waves-light">
+            <button onclick='chart.setExpanded("1").render()' class="btn btn-action-button waves-effect waves-light">
                 <i class="fas fa-chevron-down"></i>
                 Expand
             </button>
             <br>
-            <button onclick='chart.setExpanded("O-6164",false).render()' class="btn btn-action-button waves-effect waves-light">
+            <button onclick='chart.setExpanded("1",false).render()' class="btn btn-action-button waves-effect waves-light">
                 <i class="fas fa-chevron-up"></i>
                 Collapse
             </button>
             <br>
-            <button onclick='chart.addNode({name:"Karla Košir", positionName:"Kčer", id: 5, parentId: 1, width:300, height:300})' class="btn btn-action-button waves-effect waves-light">
+            <button onclick='findNode(8)' class="btn btn-action-button waves-effect waves-light">
               <i class="fas fa-folder-plus"></i>
-              Add Node
+              Find Node
           </button>
           <br>
-          <button onclick='addNodes([{name:"Test 1", positionName:"Djete", id: 6, parentId: 5, width:300, height:300},{name:"Test 2", positionName:"Djete", id: 7, parentId: 5, width:300, height:300},{name:"Test 3", positionName:"Djete", id: 8, parentId: 5, width:300, height:300}])' class="btn btn-action-button waves-effect waves-light">
+          <button onclick='chart.addNode({name:"Karla Košir", positionName:"Kčer", id: 5, parentId: 1, width:300, height:300})' class="btn btn-action-button waves-effect waves-light">
             <i class="fas fa-folder-plus"></i>
-            Add 3 Nodes
+            Add Node
         </button>
         <br>
-      <button onclick='chart.removeNode("O-6067")' class="btn btn-action-button waves-effect waves-light">
+      <button onclick='addNodes([{name:"Test 1", positionName:"Djete", id: 6, parentId: 5, width:300, height:300},
+                                                          {name:"Test 2", positionName:"Djete", id: 7, parentId: 5, width:300, height:300},
+                                                          {name:"Test 3", positionName:"Djete", id: 8, parentId: 5, width:600, height:600}])' 
+                                                          class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-folder-plus"></i>
+                Add 3 Nodes
+            </button>
+            <br>
+            <button onclick='chart.connections([{from:"6",to:"1"}]).render()' class="btn btn-action-button waves-effect waves-light">
+                <i class="fas fa-project-diagram"></i>
+                add link
+            </button>
+            <br>
+            <button onclick='chart.removeNode("O-6067")' class="btn btn-action-button waves-effect waves-light">
                 <i class="fas fa-user-times"></i>
                 remove
             </button>
@@ -340,11 +358,6 @@
             <button onclick="downloadPdf()" class="btn btn-action-button waves-effect waves-light">
                 <i class="far fa-file-pdf"></i>
                 export pdf
-            </button>
-            <br>
-            <button onclick='chart.connections([{from:"6",to:"1"}]).render()' class="btn btn-action-button waves-effect waves-light">
-                <i class="fas fa-project-diagram"></i>
-                add link
             </button>
             <br>
             <button onclick="chart.zoomOut()" class="btn btn-action-button waves-effect waves-light">
