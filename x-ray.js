@@ -52,10 +52,12 @@
           console.log(identifier, data);
         }
       })
-      .on('mouseleave', function() {
+      .on('onkeypress', function() {
         // log a line break in between mouse actions
         if (trigger) {
           if (console && typeof console.log === 'function') {
+            console.log('');
+            console.log('');
             console.log('');
           }
           trigger = false;
