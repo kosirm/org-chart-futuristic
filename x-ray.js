@@ -9,7 +9,7 @@
     // listen to every element (!)
     // probably not performant, but who caressss
     d3.selectAll('*')
-      .on('click', function() {
+      .on('mouseenter', function() {
         var node,
             data,
             attributes,
@@ -52,4 +52,13 @@
           console.log(identifier, data);
         }
       })
+      .on('mouseleave', function() {
+        // log a line break in between mouse actions
+        if (trigger) {
+          if (console && typeof console.log === 'function') {
+            console.log('');
+          }
+          trigger = false;
+        }
+      });
   }).call(this);
