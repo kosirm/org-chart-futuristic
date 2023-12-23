@@ -52,14 +52,16 @@
           console.log(identifier, data);
         }
       })
-      .on('onkeypress', function() {
+      .on('mouseleave', function() {
         // log a line break in between mouse actions
         if (trigger) {
           if (console && typeof console.log === 'function') {
-            console.log('');
-            console.log('');
-            console.log('');
-          }
+              console.log('');
+              console.log('');
+              console.log('');
+        }
+        }
+        }
           trigger = false;
         }
       });
