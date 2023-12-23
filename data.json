@@ -1,0 +1,6 @@
+[
+    { "name":"Milan Košir", "positionName":"Tata", "id": 1, "parentId": null, "width":500, "height": 200},
+    { "name":"Mirjan Košir", "positionName":"Sin", "id": 2, "parentId": 1 , "width":300, "height":500},
+    { "name":"Karmen Košir", "positionName":"Kčer", "id": 3, "parentId": 1 , "width": 500, "height": 300},
+    { "name":"Laura Košir", "positionName":"Kčer", "id": 4, "parentId": 1 , "width": 500, "height": 300}
+  ]
