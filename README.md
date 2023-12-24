@@ -1,2 +1,5 @@
-# web-platform-o5t1ha
-Ok, sad bi to trebao prebacit u vite... good luck
+# doing chart for bible study
+
+yay, connections wrapper je sad iza ... super duper
+Ok, sad bi to trebao prebacit u vite...
+  +Xstate, +playwrite...

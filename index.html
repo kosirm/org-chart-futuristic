@@ -6,9 +6,11 @@
         <script src="d3.v7.min.js"></script>
         <script src="d3-org-chart.js"></script>
         <script src="d3-flextree.min.js"></script>
-        <script src="./alpinejs_3_13_3.min.js" defer></script>
+        <script src="alpinejs_3_13_3.min.js" defer></script>
         <div class="chart-container" style="height: 1200px"></div>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+        <script src="https://unpkg.com/html2canvas@1.1.4/dist/html2canvas.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
         <link rel="stylesheet" href="style.css">
         <script>
       
@@ -19,6 +21,19 @@
         nodes.forEach((node) => chart.addNode(node));
       }
 
+      /*
+      Najprije vite i pinegrow, inače sam spržen
+      Možda i xstate... da napravim red (?)
+      ok, sad mi treba:
+      označiti node da je pročitan i zapisati u polje "Pročitano" value TRUE
+      označiti node, koji su pročitani (value TRUE) sa posebnom bojom
+      napraviti query za sve node, koji su pročitani
+      Onda ide povezivanje sa pouchdb
+      Započeti sa time, da se može nalovdati skrutacija sa svim node-ovima i sačuvati u indexdb
+      I onda sljedeči korak je import / export u google docs ili dropbox
+      */
+
+      //ovo radi super !
       function findNode(id){
           console.log("Ima li node?:"+chart.findNode(id))
       }
@@ -32,6 +47,10 @@
         chart.setHighlighted(id).render()
         event.stopPropagation() //inače napravi trigger na markRoot()
       }
+
+      var nodeStyle = ""
+      var buttonStyle = '<div style="position:absolute; left:-8px; bottom:-8px; color:#2CAAE5; border-radius:30px; padding:10px; font-size:50px; margin:auto auto; background-color:#040910; border: 1px solid #2CAAE5">'
+
       var chart
       fetch('data.json')
       .then((d) => d.json())
@@ -50,7 +69,8 @@
           //.neightbourMargin((a, b) => 50)
           .siblingsMargin((d) => 100)
           .buttonContent(({ node, state }) => {
-              return `<div style="position:absolute;left:-8px;bottom:-8px;color:#2CAAE5;border-radius:30px;padding:10px;font-size:50px;margin:auto auto;background-color:#040910; border: 1px solid #2CAAE5">
+              return `  
+                            ${buttonStyle}
                             <span style="padding-left:10px; padding-right:10px; font-size:25px;text-align: center;">
                               ${
                                 node.children?
@@ -58,7 +78,8 @@
                                   : `${node.data._directSubordinates}`
                                 }
                             </span>
-                          </div>`;
+                          </div>
+                        `;
           })
           .linkUpdate(function (d, i, arr) {
             d3.select(this)
@@ -74,18 +95,18 @@
             }
           })
           .nodeContent(function (d, i, arr, state) {
-            const svgStr = `<svg width=150 height=75  style="background-color:none"> <path d="M 0,15 L15,0 L135,0 L150,15 L150,60 L135,75 L15,75 L0,60" fill="#2599DD" stroke="#2599DD"/> </svg>`;
+            const cornerSvg = `<svg width=150 height=75  style="background-color:none"> <path d="M 0,15 L15,0 L135,0 L150,15 L150,60 L135,75 L15,75 L0,60" fill="#2599DD" stroke="#2599DD"/> </svg>`;
             return `
-                          <div class="left-top" style="position:absolute;left:-10px;top:-10px">  ${svgStr}</div>
-                          <div class="right-top" style="position:absolute;right:-10px;top:-10px">  ${svgStr}</div>
-                          <div class="right-bottom" style="position:absolute;right:-10px;bottom:-14px">  ${svgStr}</div>
-                          <div class="left-bottom" style="position:absolute;left:-10px;bottom:-14px">  ${svgStr}</div>
+                          <div class="left-top" style="position:absolute;left:-10px;top:-10px">  ${cornerSvg}</div>
+                          <div class="right-top" style="position:absolute;right:-10px;top:-10px">  ${cornerSvg}</div>
+                          <div class="right-bottom" style="position:absolute;right:-10px;bottom:-14px">  ${cornerSvg}</div>
+                          <div class="left-bottom" style="position:absolute;left:-10px;bottom:-14px">  ${cornerSvg}</div>
                           <div 
-                          onclick="markRoot('${d.data.id}')"
-                          style="font-family: 'Inter'; background-color:#081424;sans-serif; position:absolute;margin-top:-1px; margin-left:-1px;width:${d.width}px;height:${d.height}px;border-radius:0px;border: 2px solid #2CAAE5">
+                            onclick="markRoot('${d.data.id}')"
+                            style="font-family: 'Inter'; background-color:#081424;sans-serif; position:absolute;margin-top:-1px; margin-left:-1px;width:${d.width}px;height:${d.height}px;border-radius:0px;border: 3px solid #2599DD">
                             <div 
-                            onclick="highlight('${d.data.id}',event)"
-                            style="color:#2CAAE5;position:absolute;right:15px;top:-20px;">
+                              onclick="highlight('${d.data.id}',event)"
+                              style="color:#2CAAE5;position:absolute;right:15px;top:-20px;">
                               <div style="font-size:15px;color:#2CAAE5;margin-top:32px"> ${d.data.name} </div>
                               <div style="font-size:10px;"> ${d.data.positionName || '' } </div>
                               <div style="font-size:10px;"> ${ d.data.id || ''} </div>
@@ -121,28 +142,28 @@
             `url(${replaced}), radial-gradient(circle at center, #04192B 0, #000B0E 100%)`
           );
 
-      function downloadPdf() {
-        chart.exportImg({
-          save: false,
-          onLoad: (base64) => {
-            var pdf = new jspdf.jsPDF();
-            var img = new Image();
-            img.src = base64;
-            img.onload = function () {
-              pdf.addImage(
-                img,
-                'JPEG',
-                5,
-                5,
-                595 / 3,
-                ((img.height / img.width) * 595) / 3
-              );
-              pdf.save('chart.pdf');
-            };
-          },
-        });
-      }
-    });
+            function downloadPdf() {
+              chart.exportImg({
+                save: false,
+                onLoad: (base64) => {
+                  var pdf = new jspdf.jsPDF();
+                  var img = new Image();
+                  img.src = base64;
+                  img.onload = function () {
+                    pdf.addImage(
+                      img,
+                      'JPEG',
+                      5,
+                      5,
+                      595 / 3,
+                      ((img.height / img.width) * 595) / 3
+                    );
+                    pdf.save('chart.pdf');
+                  };
+                },
+              });
+            }
+          });
         </script>
         <!-- <script src="./pieChart.js"></script> -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -104,7 +104,7 @@
              &nbsp;&nbsp;&nbsp;&nbsp;return '' // Custom HTML <br/>
              })</code>
              <br/> 
-             Or check different <a href="https://github.com/bumbeishvili/org-chart#jump-to-examples" target="_blank">layout examples</a>
+             Or check examples online...
              </div>`,
 
                 /* Node expand & collapse button content and styling. You can access same helper methods as above */
@@ -266,9 +266,9 @@
                         const labelWidth = this.getTextWidth(conn.label, { ctx: state.ctx, fontSize: 2, defaultFont: state.defaultFont });
                         return `
                             <linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#2599DD"/>
-                                <stop offset="50%" stop-color="#ffffff"/>
-                                <stop offset="100%" stop-color="#2599DD"/>
+                                <stop offset="0%" stop-color="#2599DD" stop-opacity="0%"/>
+                                <stop offset="50%" stop-color="#2CAAE5" stop-opacity="100%"/>
+                                <stop offset="100%" stop-color="#2599DD" stop-opacity="0%"/>
                             </linearGradient>
                     `}).join("")}
                     </defs>
@@ -280,7 +280,7 @@
                         .attr("stroke", d => 'url(#linear)')
                         .attr('stroke-linecap', 'round')
                         .attr("stroke-opacity","0.1")
-                        .attr("stroke-width", d => '5')
+                        .attr("stroke-width", d => '10')
                         .attr('pointer-events', 'none')
                         .attr("marker-start", d => `url(#${d.from + "_" + d.to})`)
                         .attr("marker-end", d => `url(#arrow-${d.from + "_" + d.to})`)
@@ -624,20 +624,20 @@
                     selector: "center-group"
                 })
 
-            attrs.linksWrapper = attrs.centerG.patternify({
-                tag: "g",
-                selector: "links-wrapper"
-            })
-
-            attrs.nodesWrapper = attrs.centerG.patternify({
-                tag: "g",
-                selector: "nodes-wrapper"
-            })
-
             attrs.connectionsWrapper = attrs.centerG.patternify({
                 tag: "g",
                 selector: "connections-wrapper"
             })
+
+            attrs.linksWrapper = attrs.centerG.patternify({
+                tag: "g",
+                selector: "links-wrapper"
+            })    
+
+            attrs.nodesWrapper = attrs.centerG.patternify({
+                tag: "g",
+                selector: "nodes-wrapper"
+            })    
 
             attrs.defsWrapper = svg.patternify({
                 tag: "g",
